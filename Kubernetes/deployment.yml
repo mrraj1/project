@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-webapp-deployment
+  labels:
+    app: user-webapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-webapp
+  template:
+    metadata:
+      labels:
+        app: user-webapp
+    spec:
+      containers:
+      - name: user-webapp-container
+        image: 940482452163.dkr.ecr.us-west-2.amazonaws.com/poc-dev-cluster-repo-1:6
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1024Mi
+          requests:
+            cpu: 500m
+            memory: 512Mi
+      imagePullSecrets:
+      - name: ecr-secret
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-webapp-deployment
+spec:
+  selector:
+    app: user-webapp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer
